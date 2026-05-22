@@ -73,8 +73,8 @@ Resumo Netlify: compacte `index.html` + `gestores.config.js` e use [Netlify Drop
 ## Autor
 
 **Lucas Santos** — L.A CUSTOM  
-LinkedIn: *(adicione seu perfil)*  
-Demo ao vivo: *(adicione o link Netlify/Firebase após publicar)*
+LinkedIn: https://www.linkedin.com/in/lucas-silva-santos-778542256/
+https://campanhalacustom.netlify.app/
 
 ## Licença
 
