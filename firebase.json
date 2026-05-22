@@ -1,0 +1,22 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "backup.html",
+      "backup.txt",
+      "index.txt",
+      "firestore.rules",
+      "FIREBASE_SETUP.md",
+      "DEPLOY.md"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

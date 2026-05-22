@@ -1,0 +1,21 @@
+# Dependências / build
+node_modules/
+.firebase/
+
+# Artefatos de deploy
+campanha-la-custom-site.zip
+
+# Config local (e-mails de gestores — não versionar)
+gestores.config.js
+
+# Backups locais
+backup.html
+backup.txt
+index.txt
+
+# SO / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

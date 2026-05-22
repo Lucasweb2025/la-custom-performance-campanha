@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L.A CUSTOM - Programa Performance Premium</title>
+  <link rel="icon" type="image/png" href="https://i.ibb.co/27cxGcb1/lacustomlogotipo.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="gestores.config.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCe8IbdazqyglTlynqQDgRBPMwxBRJMF_g",
+      authDomain: "lacustomsperformace.firebaseapp.com",
+      projectId: "lacustomsperformace",
+      storageBucket: "lacustomsperformace.firebasestorage.app",
+      messagingSenderId: "476310811772",
+      appId: "1:476310811772:web:72a34cd46d3bb99587c5f9",
+      measurementId: "G-3FRRRT8CLJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const FieldValue = firebase.firestore.FieldValue;
+  </script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Archivo Narrow', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body.la-app {
+      background: #08090b;
+      min-height: 100vh;
+    }
+
+    .la-page-wrap,
+    .la-auth-page {
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .la-page-wrap::before,
+    .la-auth-page::before {
+      content: '';
+      position: fixed;
+      width: min(95vw, 780px);
+      height: min(95vw, 780px);
+      top: -18%;
+      right: -12%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(229, 169, 59, 0.2) 0%, rgba(229, 169, 59, 0.06) 42%, transparent 72%);
+      filter: blur(48px);
+      pointer-events: none;
+      z-index: 0;
+      animation: la-glow-drift 14s ease-in-out infinite alternate;
+    }
+
+    .la-page-wrap::after,
+    .la-auth-page::after {
+      content: '';
+      position: fixed;
+      width: min(70vw, 520px);
+      height: min(70vw, 520px);
+      bottom: -12%;
+      left: -14%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 198, 108, 0.1) 0%, transparent 68%);
+      filter: blur(56px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes la-glow-drift {
+      0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+      100% { transform: translate(-4%, 5%) scale(1.06); opacity: 1; }
+    }
+
+    .la-z { position: relative; z-index: 1; }
+
+    .la-glass-card {
+      background: rgba(17, 19, 23, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(229, 169, 59, 0.14);
+      border-radius: 14px;
+      box-shadow: 0 28px 60px -16px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      transition: border-color 0.45s ease, box-shadow 0.45s ease;
+    }
+
+    .la-glass-card:hover {
+      border-color: rgba(229, 169, 59, 0.32);
+      box-shadow: 0 28px 60px -16px rgba(0, 0, 0, 0.65), 0 0 48px rgba(229, 169, 59, 0.1);
+    }
+
+    .la-panel {
+      background: rgba(17, 19, 23, 0.78);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(28, 31, 38, 0.95);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.35s ease;
+    }
+
+    .la-panel:hover {
+      border-color: rgba(229, 169, 59, 0.22);
+      box-shadow: 0 0 36px rgba(229, 169, 59, 0.07);
+    }
+
+    .btn-la-primary {
+      background: linear-gradient(120deg, #c9922e 0%, #e5a93b 25%, #f5c66c 50%, #e5a93b 75%, #c9922e 100%);
+      background-size: 220% 220%;
+      background-position: 0% 50%;
+      color: #0a0a0a;
+      font-weight: 800;
+      transition: background-position 0.55s ease, transform 0.25s ease, box-shadow 0.45s ease;
+      box-shadow: 0 4px 24px rgba(229, 169, 59, 0.28);
+    }
+
+    .btn-la-primary:hover:not(:disabled) {
+      background-position: 100% 50%;
+      box-shadow: 0 8px 32px rgba(229, 169, 59, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .btn-la-primary:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-la-ghost {
+      background: transparent;
+      border: 1px solid rgba(229, 169, 59, 0.35);
+      color: #e5a93b;
+      transition: background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease, color 0.3s ease;
+    }
+
+    .btn-la-ghost:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(229, 169, 59, 0.18) 0%, rgba(245, 198, 108, 0.06) 100%);
+      border-color: #e5a93b;
+      box-shadow: 0 0 24px rgba(229, 169, 59, 0.15);
+      color: #f5c66c;
+    }
+
+    .la-nav-tab {
+      transition: background 0.4s ease, color 0.3s ease, box-shadow 0.4s ease;
+    }
+
+    .la-nav-tab:hover:not(.la-nav-active) {
+      background: linear-gradient(135deg, rgba(229, 169, 59, 0.14) 0%, rgba(229, 169, 59, 0.02) 100%);
+      color: #fff;
+    }
+
+    .la-nav-active {
+      background: linear-gradient(120deg, #e5a93b 0%, #f5c66c 50%, #e5a93b 100%) !important;
+      background-size: 200% 200% !important;
+      color: #0a0a0a !important;
+      box-shadow: 0 2px 18px rgba(229, 169, 59, 0.35);
+    }
+
+    .la-nav-active:hover {
+      background-position: 100% 50% !important;
+    }
+
+    .text-la-gradient {
+      background: linear-gradient(135deg, #ffffff 0%, #e5a93b 45%, #f5c66c 85%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .la-tag-pill {
+      background: linear-gradient(135deg, rgba(229, 169, 59, 0.12) 0%, rgba(229, 169, 59, 0.04) 100%);
+      border: 1px solid rgba(229, 169, 59, 0.28);
+      color: #e5a93b;
+    }
+
+    .la-input {
+      transition: border-color 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .la-input:focus {
+      box-shadow: 0 0 0 3px rgba(229, 169, 59, 0.18);
+    }
+
+    .la-chip-product {
+      transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.25s ease;
+    }
+
+    .la-chip-product:hover {
+      border-color: rgba(229, 169, 59, 0.45) !important;
+      box-shadow: 0 0 20px rgba(229, 169, 59, 0.12);
+    }
+
+    .animate-fade-in {
+      animation: la-fade-in 0.5s ease-out;
+    }
+
+    @keyframes la-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="la-app text-white antialiased selection:bg-[#e5a93b]/30">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+
+    const LOGO_URL = 'https://i.ibb.co/27cxGcb1/lacustomlogotipo.png';
+    const CHAVE_CADASTRO = 'LA2026';
+    const GESTOR_EMAILS = (window.GESTOR_EMAILS || []).map((e) => e.toLowerCase().trim());
+
+    function emailEhGestor(email) {
+      if (!email) return false;
+      return GESTOR_EMAILS.includes(email.toLowerCase().trim());
+    }
+
+    async function garantirPerfilGestor(user, data) {
+      const email = (user.email || data.email || '').toLowerCase();
+      if (!emailEhGestor(email) || data.role === 'gerente') return data;
+      await db.collection('users').doc(user.uid).update({ role: 'gerente' });
+      return { ...data, role: 'gerente' };
+    }
+
+    function Logo({ className = 'h-9' }) {
+      const [imgErro, setImgErro] = useState(false);
+      if (imgErro) {
+        return (
+          <div className={`bg-[#e5a93b] text-black font-black px-2.5 py-1 rounded text-base tracking-tighter flex items-center justify-center ${className}`}>
+            LA
+          </div>
+        );
+      }
+      return (
+        <img
+          src={LOGO_URL}
+          alt="L.A CUSTOM"
+          className={`${className} w-auto max-w-[200px] object-contain`}
+          onError={() => setImgErro(true)}
+        />
+      );
+    }
+
+    function calcularPontosProdutos(produtoIds) {
+      let base = produtoIds.reduce((acc, id) => acc + (PRODUTOS_DB[id]?.pontos || 0), 0);
+      let maxMult = 1.0;
+      COMBOS_REGRAS.forEach(combo => {
+        if (combo.itens.every(item => produtoIds.includes(item)) && combo.multiplicador > maxMult) {
+          maxMult = combo.multiplicador;
+        }
+      });
+      return { pontos: Math.round(base * maxMult), maxMult };
+    }
+
+    function analisarVendasUsuario(contratos, userId, extraSim = null) {
+      const validados = contratos.filter((c) => c.vendedorId === userId && c.status === 'Validado');
+      const premiumDistintos = new Set();
+      let teveMultiplicador = false;
+      validados.forEach((c) => {
+        (c.produtoIds || []).forEach((id) => {
+          if (PREMIUM_IDS.includes(id)) premiumDistintos.add(id);
+        });
+        if ((c.multiplicador || 1) > 1) teveMultiplicador = true;
+      });
+      if (extraSim?.produtoIds?.length) {
+        extraSim.produtoIds.forEach((id) => {
+          if (PREMIUM_IDS.includes(id)) premiumDistintos.add(id);
+        });
+        if (extraSim.maxMult > 1) teveMultiplicador = true;
+      }
+      return { premiumDistintos, teveMultiplicador };
+    }
+
+    function calcularTierEfetivo(pontos, contratos, userId, extraSim = null) {
+      const { premiumDistintos, teveMultiplicador } = analisarVendasUsuario(contratos, userId, extraSim);
+      const pts = Math.round(pontos);
+      let tier = 'INICIANTE';
+      let aviso = '';
+
+      if (pts >= 220) {
+        tier = 'BLACK';
+      } else if (pts >= 140) {
+        if (premiumDistintos.size >= 2 || teveMultiplicador) tier = 'GOLD';
+        else {
+          tier = 'SILVER';
+          aviso = 'Pontos Gold, mas falta: 2 Premium diferentes ou 1 combo multiplicador validado.';
+        }
+      } else if (pts >= 80) {
+        if (premiumDistintos.size >= 1) tier = 'SILVER';
+        else {
+          tier = 'BRONZE';
+          aviso = 'Pontos Silver, mas falta: mínimo 1 produto Premium em venda validada.';
+        }
+      } else if (pts >= 40) {
+        tier = 'BRONZE';
+      }
+
+      return { tier, aviso, premiumCount: premiumDistintos.size, teveMultiplicador };
+    }
+
+    function exportarRankingCSV(ranking) {
+      const linhas = [
+        ['Posicao', 'Consultor', 'Concessionaria', 'Vendas', 'Pontos', 'Tier'].join(';'),
+        ...ranking.filter((v) => v.role !== 'gerente').map((v, i) =>
+          [i + 1, `"${v.nome}"`, `"${v.concessionaria}"`, v.vendas, v.pontos, v.tier].join(';')
+        )
+      ];
+      const blob = new Blob(['\uFEFF' + linhas.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ranking-la-custom-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    const PRODUTOS_DB = {
+      ppf_full: { id: 'ppf_full', nome: 'PPF Full', categoria: 'Premium', pontos: 60, desc: 'Película de proteção integral', tipo: 'premium' },
+      crystaline: { id: 'crystaline', nome: 'Crystalline', categoria: 'Premium', pontos: 35, desc: 'Vitrificação cerâmica premium', tipo: 'premium' },
+      sas: { id: 'sas', nome: 'SAS 3M', categoria: 'Premium', pontos: 25, desc: 'Sistema antiarranhão', tipo: 'premium' },
+      combo_care: { id: 'combo_care', nome: 'Combo Care', categoria: 'Premium', pontos: 30, desc: 'Pacote completo de proteção', tipo: 'premium' },
+      parabrisa: { id: 'parabrisa', nome: 'Para-brisa', categoria: 'Estratégico', pontos: 20, desc: 'Película protetora de para-brisa', tipo: 'estrategico' },
+      insulfilm: { id: 'insulfilm', nome: 'Insulfilm', categoria: 'Constância', pontos: 8, desc: 'Película solar tradicional', tipo: 'constancia' },
+      higienizacao: { id: 'higienizacao', nome: 'Higienização', categoria: 'Constância', pontos: 6, desc: 'Limpeza técnica interna', tipo: 'constancia' },
+      polimento: { id: 'polimento', nome: 'Polimento', categoria: 'Constância', pontos: 10, desc: 'Correção de pintura', tipo: 'constancia' }
+    };
+
+    const PREMIUM_IDS = Object.keys(PRODUTOS_DB).filter((id) => PRODUTOS_DB[id].tipo === 'premium');
+
+    const COMBOS_REGRAS = [
+      { id: 'ouro', nome: 'Combo Ouro L.A', itens: ['combo_care', 'crystaline', 'ppf_full'], multiplicador: 2.0, tag: 'Multiplicador Máximo' },
+      { id: 'total', nome: 'Proteção Total', itens: ['ppf_full', 'parabrisa', 'sas'], multiplicador: 1.8, tag: 'Rota Black' },
+      { id: 'blindagem', nome: 'Blindagem Premium', itens: ['ppf_full', 'parabrisa'], multiplicador: 1.5, tag: 'Acelerador Gold' }
+    ];
+
+    const CONCESSIONARIAS = [
+      { id: 'sede', nome: 'L.A CUSTOM SEDE', icon: 'fa-building' },
+      { id: 'stuttgart_vo', nome: 'STUTTGART VILA OLIMPIA', icon: 'fa-location-dot' },
+      { id: 'stuttgart_hub', nome: 'STUTTGART HUB', icon: 'fa-layer-group' },
+      { id: 'lexus', nome: 'LEXUS ALPHAVILLE', icon: 'fa-gem' },
+      { id: 'porsche_rj', nome: 'PORSCHE CENTER RJ', icon: 'fa-car-side' },
+      { id: 'clodomiro', nome: 'UNIDADE CLODOMIRO', icon: 'fa-map-pin' },
+      { id: 'motorsport', nome: 'MOTORSPORT', icon: 'fa-flag-checkered' }
+    ];
+
+    function App() {
+      const [authMode, setAuthMode] = useState('login');
+      const [authLoading, setAuthLoading] = useState(true);
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [currentUser, setCurrentUser] = useState(null);
+      const [currentTab, setCurrentTab] = useState('inicio');
+      const [authError, setAuthError] = useState('');
+      const [submitting, setSubmitting] = useState(false);
+
+      const [vendedores, setVendedores] = useState([]);
+      const [contratos, setContratos] = useState([]);
+
+      const [simuladorSelecionados, setSimuladorSelecionados] = useState([]);
+      const [formChassi, setFormChassi] = useState('');
+      const [formProdutos, setFormProdutos] = useState([]);
+
+      const [loginEmail, setLoginEmail] = useState('');
+      const [loginSenha, setLoginSenha] = useState('');
+      const [cadNome, setCadNome] = useState('');
+      const [cadEmail, setCadEmail] = useState('');
+      const [cadSenha, setCadSenha] = useState('');
+      const [cadLoja, setCadLoja] = useState('L.A CUSTOM SEDE');
+      const [cadChave, setCadChave] = useState('');
+      const [resetEmail, setResetEmail] = useState('');
+      const [recusaModal, setRecusaModal] = useState(null);
+      const [recusaMotivo, setRecusaMotivo] = useState('');
+
+      const isGerente = currentUser?.role === 'gerente';
+
+      useEffect(() => {
+        if (isLoggedIn && !isGerente && currentTab === 'gerente') {
+          setCurrentTab('inicio');
+        }
+      }, [isLoggedIn, isGerente, currentTab]);
+
+      const meusContratos = useMemo(() => {
+        if (!currentUser) return [];
+        return contratos.filter((c) => c.vendedorId === currentUser.uid);
+      }, [contratos, currentUser]);
+
+      useEffect(() => {
+        const unsub = auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            try {
+              const snap = await db.collection('users').doc(user.uid).get();
+              if (snap.exists) {
+                let data = snap.data();
+                data = await garantirPerfilGestor(user, data);
+                setCurrentUser({ uid: user.uid, ...data });
+                setIsLoggedIn(true);
+              } else {
+                await auth.signOut();
+                setCurrentUser(null);
+                setIsLoggedIn(false);
+              }
+            } catch (err) {
+              console.error(err);
+              setAuthError('Erro ao carregar perfil.');
+            }
+          } else {
+            setCurrentUser(null);
+            setIsLoggedIn(false);
+          }
+          setAuthLoading(false);
+        });
+        return () => unsub();
+      }, []);
+
+      useEffect(() => {
+        if (!isLoggedIn || !currentUser) return;
+
+        const unsubUsers = db.collection('users').onSnapshot(
+          (snap) => {
+            const list = snap.docs.map((d) => ({
+              id: d.id,
+              nome: d.data().nome || 'Consultor',
+              concessionaria: d.data().concessionaria || '',
+              vendas: d.data().vendas || 0,
+              pontos: d.data().pontos || 0,
+              role: d.data().role || 'consultor',
+              isMe: d.id === currentUser.uid
+            }));
+            setVendedores(list);
+          },
+          (err) => console.error('users:', err)
+        );
+
+        const unsubContratos = db.collection('contratos').onSnapshot(
+          (snap) => {
+            const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            list.sort((a, b) => {
+              const ta = a.criadoEm?.toMillis?.() || 0;
+              const tb = b.criadoEm?.toMillis?.() || 0;
+              return tb - ta;
+            });
+            setContratos(list);
+          },
+          (err) => console.error('contratos:', err)
+        );
+
+        return () => {
+          unsubUsers();
+          unsubContratos();
+        };
+      }, [isLoggedIn, currentUser?.uid]);
+
+      const handleToggleFormProduct = (id) => {
+        setFormProdutos(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
+      };
+
+      const handleRecuperarSenha = async (e) => {
+        e.preventDefault();
+        const email = resetEmail.trim() || loginEmail.trim();
+        if (!email) return alert('Informe seu e-mail.');
+        setAuthError('');
+        setSubmitting(true);
+        try {
+          await auth.sendPasswordResetEmail(email);
+          alert('E-mail de recuperação enviado! Verifique a caixa de entrada e o spam.');
+          setAuthMode('login');
+        } catch (err) {
+          setAuthError(err.code === 'auth/user-not-found'
+            ? 'E-mail não cadastrado no sistema.'
+            : 'Não foi possível enviar o e-mail. Tente novamente.');
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        setAuthError('');
+        setSubmitting(true);
+        try {
+          await auth.signInWithEmailAndPassword(loginEmail.trim(), loginSenha);
+        } catch (err) {
+          setAuthError(err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password'
+            ? 'E-mail ou senha incorretos.'
+            : 'Não foi possível entrar. Tente novamente.');
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleEfetuarCadastro = async (e) => {
+        e.preventDefault();
+        if (!cadNome) return alert('Por favor, digite o nome completo.');
+        if (!cadEmail) return alert('Informe um e-mail válido.');
+        if (cadSenha.length < 6) return alert('A senha deve ter pelo menos 6 caracteres.');
+        if (cadChave !== CHAVE_CADASTRO) {
+          return alert('❌ ACESSO NEGADO: Chave Corporativa incorreta.');
+        }
+        setAuthError('');
+        setSubmitting(true);
+        try {
+          const cred = await auth.createUserWithEmailAndPassword(cadEmail.trim(), cadSenha);
+          const emailNorm = cadEmail.trim().toLowerCase();
+          const role = emailEhGestor(emailNorm) ? 'gerente' : 'consultor';
+          await db.collection('users').doc(cred.user.uid).set({
+            nome: cadNome,
+            email: emailNorm,
+            concessionaria: cadLoja,
+            role,
+            pontos: 0,
+            vendas: 0,
+            criadoEm: FieldValue.serverTimestamp()
+          });
+          alert(`🎯 Credenciamento aceito! Bem-vindo, ${cadNome}.`);
+          setCurrentTab('inicio');
+        } catch (err) {
+          if (err.code === 'auth/email-already-in-use') {
+            setAuthError('Este e-mail já está cadastrado. Faça login.');
+          } else {
+            setAuthError('Erro no cadastro: ' + (err.message || 'tente novamente'));
+          }
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleSubmeterVenda = async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        if (!formChassi) return alert('Por favor, digite o Chassi ou número do contrato.');
+        if (formProdutos.length === 0) return alert('Selecione pelo menos um produto para lançar.');
+
+        const chassiNorm = formChassi.toUpperCase().trim();
+        const duplicado = contratos.some(
+          (c) => c.chassi === chassiNorm && (c.status === 'Pendente' || c.status === 'Validado')
+        );
+        if (duplicado) return alert('Este chassi já possui lançamento pendente ou validado.');
+
+        const { pontos, maxMult } = calcularPontosProdutos(formProdutos);
+        setSubmitting(true);
+        try {
+          await db.collection('contratos').add({
+            chassi: chassiNorm,
+            vendedorId: currentUser.uid,
+            vendedorNome: currentUser.nome,
+            produtoIds: formProdutos,
+            produtos: formProdutos.map((p) => PRODUTOS_DB[p].nome).join(' + '),
+            pontos,
+            multiplicador: maxMult,
+            status: 'Pendente',
+            criadoEm: FieldValue.serverTimestamp()
+          });
+          setFormChassi('');
+          setFormProdutos([]);
+          alert('Contrato enviado para auditoria do gerente!');
+          setCurrentTab('inicio');
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao enviar contrato. Verifique sua conexão.');
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleAprovarContrato = async (contrato) => {
+        if (!isGerente || contrato.status !== 'Pendente') return;
+        setSubmitting(true);
+        try {
+          const batch = db.batch();
+          batch.update(db.collection('contratos').doc(contrato.id), {
+            status: 'Validado',
+            aprovadoEm: FieldValue.serverTimestamp()
+          });
+          batch.update(db.collection('users').doc(contrato.vendedorId), {
+            vendas: FieldValue.increment(1),
+            pontos: FieldValue.increment(contrato.pontos)
+          });
+          await batch.commit();
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao aprovar contrato.');
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleRecusarContrato = (contrato) => {
+        if (!isGerente || contrato.status !== 'Pendente') return;
+        setRecusaModal(contrato);
+        setRecusaMotivo('');
+      };
+
+      const handleConfirmarRecusa = async () => {
+        if (!recusaModal) return;
+        if (!recusaMotivo.trim()) return alert('Informe o motivo da recusa para o consultor.');
+        setSubmitting(true);
+        try {
+          await db.collection('contratos').doc(recusaModal.id).update({
+            status: 'Recusado',
+            motivoRecusa: recusaMotivo.trim(),
+            recusadoEm: FieldValue.serverTimestamp()
+          });
+          setRecusaModal(null);
+          setRecusaMotivo('');
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao recusar contrato.');
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const meusDados = useMemo(() => {
+        return vendedores.find((v) => v.isMe) || {
+          pontos: currentUser?.pontos || 0,
+          vendas: currentUser?.vendas || 0,
+          nome: currentUser?.nome || 'Consultor'
+        };
+      }, [vendedores, currentUser]);
+
+      const dadosCalculados = useMemo(() => {
+        let simBase = simuladorSelecionados.reduce((acc, curr) => acc + PRODUTOS_DB[curr].pontos, 0);
+        let simMaxMult = 1.0;
+        COMBOS_REGRAS.forEach(combo => {
+          if (combo.itens.every(item => simuladorSelecionados.includes(item)) && combo.multiplicador > simMaxMult) {
+            simMaxMult = combo.multiplicador;
+          }
+        });
+        let simTotalVenda = simBase * simMaxMult;
+
+        let pendentes = 0;
+        let vendasValidadas = 0;
+        contratos.forEach(c => {
+          if (c.status === 'Pendente') pendentes += 1;
+          if (c.status === 'Validado') vendasValidadas += 1;
+        });
+
+        // ORGANIZAÇÃO COMPLETA DO RANKING OFICIAL UNIFICADO
+        const rankingOrdenado = vendedores.map(v => {
+          let pontosFinais = v.pontos;
+          let vendasFinais = v.vendas;
+          const extraSim = v.isMe && simTotalVenda > 0
+            ? { produtoIds: simuladorSelecionados, maxMult: simMaxMult }
+            : null;
+          if (v.isMe) {
+            pontosFinais += simTotalVenda;
+            if (simTotalVenda > 0) vendasFinais += 1;
+          }
+
+          const { tier, aviso } = calcularTierEfetivo(pontosFinais, contratos, v.id, extraSim);
+
+          return { ...v, pontos: Math.round(pontosFinais), vendas: vendasFinais, tier, tierAviso: aviso };
+        }).sort((a, b) => b.pontos - a.pontos);
+
+        const lojasAgrupadas = Object.fromEntries(
+          CONCESSIONARIAS.map(c => [c.nome, { pontos: 0, vendas: 0, consultores: 0, icon: c.icon }])
+        );
+
+        rankingOrdenado.forEach(v => {
+          if (lojasAgrupadas[v.concessionaria]) {
+            lojasAgrupadas[v.concessionaria].pontos += v.pontos;
+            lojasAgrupadas[v.concessionaria].vendas += v.vendas;
+            if (v.role !== 'gerente') lojasAgrupadas[v.concessionaria].consultores += 1;
+          }
+        });
+
+        const totalPontosRede = rankingOrdenado.reduce((acc, v) => acc + v.pontos, 0);
+        const totalConsultores = vendedores.filter(v => v.role !== 'gerente').length;
+
+        const dashboardLojas = Object.entries(lojasAgrupadas).map(([nome, dados]) => ({
+          nome,
+          ...dados,
+          participacaoRede: totalPontosRede > 0 ? Math.round((dados.pontos / totalPontosRede) * 100) : 0
+        })).sort((a, b) => b.pontos - a.pontos);
+
+        let felipeProjecaoPontos = meusDados.pontos + simTotalVenda;
+        const simTierInfo = currentUser
+          ? calcularTierEfetivo(felipeProjecaoPontos, contratos, currentUser.uid, {
+              produtoIds: simuladorSelecionados,
+              maxMult: simMaxMult
+            })
+          : { tier: 'INICIANTE', aviso: '' };
+        let simNivel = simTierInfo.tier;
+        let simCor = 'text-zinc-500';
+        let simPremios = { bonus: 'R$ 0', comissao: '2,5% / 5,0%', extra: 'Nenhum prêmio ativo.' };
+        if (simNivel === 'BLACK') { simCor = 'text-[#38bdf8]'; simPremios = { bonus: 'R$ 700,00 (Acumulado)', comissao: '3,2% / 6,0%', extra: 'Almoço Premium + Placa + Exp. Especial 👑' }; }
+        else if (simNivel === 'GOLD') { simCor = 'text-[#e5a93b]'; simPremios = { bonus: 'R$ 700,00 (Acumulado)', comissao: '3,0% / 5,5%', extra: 'Almoço Premium + Reconhecimento 🥇' }; }
+        else if (simNivel === 'SILVER') { simCor = 'text-slate-300'; simPremios = { bonus: 'R$ 500,00', comissao: '2,5% / 5,0%', extra: 'Almoço Premium + Reconhecimento 🥈' }; }
+        else if (simNivel === 'BRONZE') { simCor = 'text-amber-600'; simPremios = { bonus: 'R$ 200,00', comissao: '2,5% / 5,0%', extra: 'Reconhecimento Interno 🥉' }; }
+
+        return {
+          simBase, simMaxMult, simTotalVenda, pendentes, vendasValidadas,
+          totalConsultores, totalPontosRede, rankingOrdenado, dashboardLojas,
+          simNivel, simCor, simPremios, simTierAviso: simTierInfo.aviso
+        };
+      }, [simuladorSelecionados, contratos, vendedores, meusDados, currentUser]);
+
+      const handleLogout = async () => {
+        await auth.signOut();
+        setAuthMode('login');
+        setSimuladorSelecionados([]);
+        setAuthError('');
+      };
+
+      if (authLoading) {
+        return (
+          <div className="la-auth-page min-h-screen flex items-center justify-center">
+            <div className="la-z text-center">
+              <div className="text-[#e5a93b] text-2xl mb-3"><i className="fa-solid fa-circle-notch fa-spin"></i></div>
+              <p className="text-xs text-[#868c96] uppercase tracking-widest">Conectando ao Firebase...</p>
+            </div>
+          </div>
+        );
+      }
+
+      if (!isLoggedIn) {
+        if (authMode === 'login') {
+          return (
+            <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
+              <div className="la-z w-full max-w-md">
+                <div className="la-glass-card p-8 md:p-10 w-full">
+                <div className="flex flex-col items-center mb-6 text-center">
+                  <span className="la-tag-pill text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-4">♦ Campanha Premium</span>
+                  <Logo className="h-14 mb-4" />
+                  <h2 className="text-2xl font-black font-mono tracking-wider uppercase text-la-gradient">L.A CUSTOM</h2>
+                  <p className="text-[10px] text-[#868c96] tracking-widest uppercase mt-2">Programa Performance Premium</p>
+                </div>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  {authError && <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2 rounded">{authError}</p>}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">E-mail</label>
+                    <input type="email" required value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">Senha</label>
+                    <input type="password" required value={loginSenha} onChange={(e) => setLoginSenha(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <button type="submit" disabled={submitting} className="w-full btn-la-primary uppercase text-xs tracking-wider py-3.5 rounded-lg disabled:opacity-50">
+                    {submitting ? 'Entrando...' : 'Entrar no Sistema'}
+                  </button>
+                  <div className="text-center pt-2 space-y-1">
+                    <span onClick={() => { setAuthMode('recuperar'); setResetEmail(loginEmail); setAuthError(''); }} className="block text-xs text-[#868c96] hover:text-[#e5a93b] cursor-pointer underline">
+                      Esqueci minha senha
+                    </span>
+                    <span onClick={() => setAuthMode('cadastro')} className="block text-xs text-[#868c96] hover:text-[#e5a93b] cursor-pointer underline">
+                      É um Executivo Novo? Cadastre-se aqui
+                    </span>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          );
+        } else if (authMode === 'recuperar') {
+          return (
+            <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
+              <div className="la-z w-full max-w-md">
+                <div className="la-glass-card p-8 md:p-10 w-full">
+                  <div className="flex flex-col items-center mb-6 text-center">
+                    <Logo className="h-12 mb-3" />
+                    <h2 className="text-xl font-bold font-mono tracking-wider uppercase text-la-gradient">Recuperar Senha</h2>
+                    <p className="text-[10px] text-[#868c96] tracking-widest uppercase mt-1">Enviaremos um link para seu e-mail</p>
+                  </div>
+                  <form onSubmit={handleRecuperarSenha} className="space-y-4">
+                    {authError && <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2 rounded">{authError}</p>}
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">E-mail cadastrado</label>
+                      <input type="email" required value={resetEmail} onChange={(e) => setResetEmail(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                    </div>
+                    <button type="submit" disabled={submitting} className="w-full btn-la-primary uppercase text-xs tracking-wider py-3.5 rounded-lg disabled:opacity-50">
+                      {submitting ? 'Enviando...' : 'Enviar link de recuperação'}
+                    </button>
+                    <div className="text-center pt-2">
+                      <span onClick={() => setAuthMode('login')} className="text-xs text-[#868c96] hover:text-white cursor-pointer underline">
+                        Voltar para o login
+                      </span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
+              <div className="la-z w-full max-w-md">
+                <div className="la-glass-card p-8 md:p-10 w-full animate-fade-in">
+                <div className="flex flex-col items-center mb-6 text-center">
+                  <Logo className="h-12 mb-3" />
+                  <h2 className="text-xl font-bold font-mono tracking-wider uppercase text-la-gradient">Ficha de Cadastro</h2>
+                  <p className="text-[10px] text-[#868c96] tracking-widest uppercase mt-1">Validação Interconcessionária</p>
+                </div>
+                <form onSubmit={handleEfetuarCadastro} className="space-y-4">
+                  {authError && <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-2 rounded">{authError}</p>}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">Nome Completo</label>
+                    <input type="text" placeholder="Ex: Lucas Silva" value={cadNome} onChange={(e) => setCadNome(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">E-mail Corporativo</label>
+                    <input type="email" required placeholder="seu.email@empresa.com" value={cadEmail} onChange={(e) => setCadEmail(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">Senha de Acesso</label>
+                    <input type="password" required minLength={6} placeholder="Mínimo 6 caracteres" value={cadSenha} onChange={(e) => setCadSenha(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider">Sua Concessionária</label>
+                    <select value={cadLoja} onChange={(e) => setCadLoja(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#e5a93b]">
+                      {CONCESSIONARIAS.map(c => (
+                        <option key={c.id} value={c.nome}>{c.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[#868c96] mb-1.5 tracking-wider text-[#e5a93b]"><i className="fa-solid fa-key mr-1"></i>Chave de Acesso Corporativa</label>
+                    <input type="text" placeholder="Chave de Ativação (Ex: LA2026)" value={cadChave} onChange={(e) => setCadChave(e.target.value)} className="la-input w-full bg-[#08090b] border border-[#e5a93b]/40 rounded-lg p-2.5 text-sm font-mono text-[#e5a93b] placeholder-amber-900/40 focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <button type="submit" disabled={submitting} className="w-full btn-la-primary uppercase text-xs tracking-wider py-3.5 rounded-lg disabled:opacity-50">
+                    {submitting ? 'Cadastrando...' : 'Concluir Credenciamento'}
+                  </button>
+                  <div className="text-center pt-2">
+                    <span onClick={() => setAuthMode('login')} className="text-xs text-[#868c96] hover:text-white cursor-pointer underline">
+                      Voltar para o Login padrão
+                    </span>
+                  </div>
+                </form>
+                </div>
+              </div>
+            </div>
+          );
+        }
+      }
+
+      return (
+        <div className="la-page-wrap min-h-screen">
+        <div className="la-z max-w-6xl mx-auto p-4 md:p-6 animate-fade-in">
+          
+          {/* HEADER PRINCIPAL COM DESTAQUE DINÂMICO DE ABAS CORRIGIDO */}
+          <header className="flex flex-col lg:flex-row justify-between items-center pb-5 border-b border-[#1c1f26]/80 mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <Logo className="h-8" />
+              <div>
+                <h1 className="text-sm font-bold tracking-wider font-mono uppercase">L.A CUSTOM</h1>
+                <p className="text-[9px] text-[#868c96] tracking-widest uppercase">PERFORMANCE SUITE</p>
+              </div>
+            </div>
+            
+            <nav className="flex la-panel border border-[#1c1f26] p-1 rounded-xl gap-1 text-[11px] font-bold uppercase tracking-wider w-full lg:w-auto overflow-x-auto">
+              <button onClick={() => setCurrentTab('inicio')} className={`la-nav-tab px-4 py-2 rounded-lg whitespace-nowrap ${currentTab === 'inicio' ? 'la-nav-active' : 'text-[#868c96]'}`}>
+                <i className="fa-solid fa-house mr-1.5"></i>Início Geral
+              </button>
+              <button onClick={() => setCurrentTab('lojas')} className={`la-nav-tab px-4 py-2 rounded-lg whitespace-nowrap ${currentTab === 'lojas' ? 'la-nav-active' : 'text-[#868c96]'}`}>
+                <i className="fa-solid fa-layer-group mr-1.5"></i>Concessionárias
+              </button>
+              <button onClick={() => setCurrentTab('lancar')} className={`la-nav-tab px-4 py-2 rounded-lg whitespace-nowrap ${currentTab === 'lancar' ? 'la-nav-active' : 'text-[#868c96]'}`}>
+                <i className="fa-solid fa-square-plus mr-1.5"></i>Lançar Venda
+              </button>
+              <button onClick={() => setCurrentTab('historico')} className={`la-nav-tab px-4 py-2 rounded-lg whitespace-nowrap ${currentTab === 'historico' ? 'la-nav-active' : 'text-[#868c96]'}`}>
+                <i className="fa-solid fa-clock-rotate-left mr-1.5"></i>Minhas Vendas
+              </button>
+              {isGerente && (
+                <button onClick={() => setCurrentTab('gerente')} className={`la-nav-tab px-4 py-2 rounded-lg flex items-center gap-1.5 whitespace-nowrap ${currentTab === 'gerente' ? 'la-nav-active' : 'text-[#868c96]'}`}>
+                  <i className="fa-solid fa-user-gear"></i>Painel do Gerente
+                  {dadosCalculados.pendentes > 0 && <span className="bg-rose-500 text-white font-sans text-[9px] px-1.5 py-0.5 rounded-full animate-pulse">{dadosCalculados.pendentes}</span>}
+                </button>
+              )}
+            </nav>
+
+            <div className="flex items-center gap-3 self-end lg:self-center">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-bold text-white">{currentUser?.nome}</p>
+                <p className="text-[9px] text-[#868c96] uppercase">{isGerente ? 'Gerente Geral' : currentUser?.concessionaria}</p>
+              </div>
+              <button 
+                onClick={handleLogout}
+                className="text-xs text-rose-400 hover:text-rose-500 font-bold flex items-center gap-1 bg-rose-500/5 border border-rose-500/10 px-3 py-1.5 rounded transition-all hover:bg-rose-500/10 active:scale-95"
+              >
+                <i className="fa-solid fa-right-from-bracket"></i> Sair
+              </button>
+            </div>
+          </header>
+
+          {/* TELA 1: INÍCIO GERAL COMPLETA */}
+          {currentTab === 'inicio' && (
+            <div className="space-y-6">
+              <section className="la-panel border border-[#1c1f26] p-6 rounded-xl">
+                <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold flex items-center gap-1.5 mb-1"><span>♦</span> CAMPANHA PREMIUM</div>
+                <h2 className="text-3xl font-black font-mono uppercase"><span className="text-white">PROGRAMA </span><span className="text-la-gradient">PERFORMANCE PREMIUM</span></h2>
+                <p className="text-[#868c96] text-xs max-w-2xl mt-2 leading-relaxed">Direcionamento estratégico para alta rentabilidade. Use o simulador tátil abaixo e veja a reordenação instantânea do Leaderboard.</p>
+              </section>
+
+              {/* CARDS KPI DA CAMPANHA (dados reais do Firebase) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl">
+                  <span className="text-[9px] text-[#868c96] uppercase font-bold tracking-wider">Consultores Ativos</span>
+                  <h4 className="text-xl font-black font-mono text-emerald-400 mt-0.5">{dadosCalculados.totalConsultores}</h4>
+                </div>
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl">
+                  <span className="text-[9px] text-[#868c96] uppercase font-bold tracking-wider">Pontuação Total da Rede</span>
+                  <h4 className="text-xl font-black font-mono text-[#38bdf8] mt-0.5">{dadosCalculados.totalPontosRede.toLocaleString('pt-BR')} <span className="text-xs font-normal font-sans text-zinc-500">pts</span></h4>
+                </div>
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl">
+                  <span className="text-[9px] text-[#868c96] uppercase font-bold tracking-wider">Aprovações Pendentes</span>
+                  <h4 className={`text-xl font-black font-mono mt-0.5 ${dadosCalculados.pendentes > 0 ? 'text-[#e5a93b]' : 'text-zinc-500'}`}>
+                    {dadosCalculados.pendentes} na fila
+                  </h4>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl">
+                  <span className="text-[9px] text-[#868c96] uppercase font-bold tracking-wider">Vendas Validadas (campanha)</span>
+                  <h4 className="text-lg font-black font-mono text-white mt-0.5">{dadosCalculados.vendasValidadas}</h4>
+                </div>
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl">
+                  <span className="text-[9px] text-[#868c96] uppercase font-bold tracking-wider">Unidades na disputa</span>
+                  <h4 className="text-lg font-black font-mono text-[#e5a93b] mt-0.5">{CONCESSIONARIAS.length}</h4>
+                </div>
+              </div>
+
+              {/* RÉGUA DE BENEFÍCIOS DOS TIERS */}
+              <section className="la-panel border border-[#1c1f26] p-5 rounded-xl">
+                <h4 className="text-xs font-black uppercase font-mono text-[#e5a93b] mb-4 tracking-wider"><i className="fa-solid fa-stairs mr-1.5"></i>Regras e Benefícios dos Tiers</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  <div className="p-4 bg-zinc-900/40 border border-zinc-800/80 rounded flex flex-col justify-between">
+                    <div>
+                      <div className="font-bold text-amber-600 font-mono text-sm flex justify-between"><span>🥉 BRONZE</span> <span>40 PTS</span></div>
+                      <p className="text-[10px] text-zinc-400 mt-1.5 font-medium">🎁 Bônus de R$ 200,00 + Reconhecimento interno.</p>
+                    </div>
+                    <div className="text-[9px] text-zinc-500 mt-3 border-t border-white/5 pt-2">🎯 Meta: Constância ativa</div>
+                  </div>
+                  <div className="p-4 bg-zinc-900/40 border border-zinc-800/80 rounded flex flex-col justify-between">
+                    <div>
+                      <div className="font-bold text-slate-300 font-mono text-sm flex justify-between"><span>🥈 SILVER</span> <span>80 PTS</span></div>
+                      <p className="text-[10px] text-zinc-400 mt-1.5 font-medium">🎁 Bônus de R$ 500,00 + Almoço Premium + Reconhecimento interno.</p>
+                    </div>
+                    <div className="text-[9px] text-[#e5a93b] mt-3 border-t border-white/5 pt-2 font-semibold">📌 Regra: Mínimo 1 item Premium</div>
+                  </div>
+                  <div className="p-4 bg-yellow-950/5 border border-[#e5a93b]/30 rounded flex flex-col justify-between">
+                    <div>
+                      <div className="font-bold text-[#e5a93b] font-mono text-sm flex justify-between"><span>🥇 GOLD</span> <span>140 PTS</span></div>
+                      <p className="text-[10px] text-zinc-300 mt-1.5 font-medium">🎁 Mantém Bronze+Silver. Novos sobe para <strong className="text-white">3%</strong> | Seminovos sobe para <strong className="text-white">5,5%</strong>.</p>
+                    </div>
+                    <div className="text-[9px] text-[#e5a93b] mt-3 border-t border-white/5 pt-2 font-semibold">📌 Regra: 2 Premium dif. ou 1 Multiplicador</div>
+                  </div>
+                  <div className="p-4 bg-sky-950/5 border border-[#38bdf8]/30 rounded flex flex-col justify-between">
+                    <div>
+                      <div className="font-bold text-[#38bdf8] font-mono text-sm flex justify-between"><span>💎 BLACK</span> <span>220 PTS</span></div>
+                      <p className="text-[10px] text-zinc-300 mt-1.5 font-medium">🎁 Mantém Bronze+Silver. Novos sobe para <strong className="text-white">3,2%</strong> | Seminovos para <strong className="text-white">6%</strong> + Prêmios.</p>
+                    </div>
+                    <div className="text-[9px] text-[#38bdf8] mt-3 border-t border-white/5 pt-2 font-semibold">👑 Status: Elite da Operação</div>
+                  </div>
+                </div>
+              </section>
+
+              {/* SIMULADOR INTEGRADO */}
+              <section className="la-panel border border-zinc-900/80 p-4 rounded-xl">
+                <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold mb-1">♦ SIMULADOR INTEGRADO</div>
+                <h3 className="text-lg font-bold uppercase font-mono mb-4">Combine os Agregados e Veja o Impacto</h3>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {Object.values(PRODUTOS_DB).map(prod => {
+                      const active = simuladorSelecionados.includes(prod.id);
+                      return (
+                        <div key={prod.id} onClick={() => setSimuladorSelecionados(p => p.includes(prod.id) ? p.filter(i => i !== prod.id) : [...p, prod.id])} className={`la-chip-product la-panel border p-3.5 rounded-xl cursor-pointer flex flex-col justify-between select-none active:scale-95 hover:-translate-y-1 ${active ? 'border-[#e5a93b] shadow-[0_0_16px_rgba(229,169,59,0.25)] bg-[#e5a93b]/5' : 'border-[#1c1f26]'}`}>
+                          <div>
+                            <h5 className={`text-xs font-bold transition-colors duration-300 ${active ? 'text-[#38bdf8]' : 'text-white'}`}>{prod.nome}</h5>
+                            <span className="text-[9px] text-[#868c96] uppercase font-semibold">{prod.categoria}</span>
+                          </div>
+                          <div className={`text-right font-mono text-xs font-black mt-2 transition-colors duration-300 ${active ? 'text-[#38bdf8]' : 'text-[#868c96]'}`}>+{prod.pontos}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="la-panel border border-[#1c1f26] p-4 rounded-xl flex flex-col justify-between shadow-xl">
+                    <div>
+                      <div className="flex justify-between text-xs text-[#868c96] mb-1.5">Pontos do Contrato: <span className="text-white font-mono font-bold">+{Math.round(dadosCalculados.simTotalVenda)} pts</span></div>
+                      <div className="flex justify-between text-xs text-[#868c96]">Gatilho Combo: <span className="text-[#e5a93b] font-bold">×{dadosCalculados.simMaxMult.toFixed(1)}</span></div>
+                    </div>
+                    <div className="border-t border-white/5 pt-3 mt-3">
+                      <div className="text-[10px] text-[#868c96] uppercase font-bold">Projeção {meusDados.nome} (VOCÊ)</div>
+                      <div className="text-xl font-black font-mono text-[#e5a93b] mt-0.5">{meusDados.pontos} → {Math.round(meusDados.pontos + dadosCalculados.simTotalVenda)} pts</div>
+                      <div className="mt-2 text-[10px] font-bold">Simulando Nível: <span className={`${dadosCalculados.simCor} uppercase font-mono`}>{dadosCalculados.simNivel}</span></div>
+                      {dadosCalculados.simTierAviso && (
+                        <p className="text-[9px] text-amber-500/90 mt-2 leading-relaxed">{dadosCalculados.simTierAviso}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {isGerente && (
+                <div className="flex justify-end">
+                  <button type="button" onClick={() => exportarRankingCSV(dadosCalculados.rankingOrdenado)} className="btn-la-ghost text-xs font-bold uppercase px-4 py-2 rounded-lg">
+                    <i className="fa-solid fa-file-export mr-1.5"></i>Exportar ranking (CSV)
+                  </button>
+                </div>
+              )}
+
+              {/* LEADERBOARD OFICIAL DE TODAS AS UNIDADES */}
+              <section>
+                <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold mb-1">♦ LIVE LEADERBOARD</div>
+                <h3 className="text-xl font-bold uppercase font-mono mb-4">Ranking Geral Corporativo (Todas as Unidades)</h3>
+                <div className="la-panel border border-[#1c1f26] rounded-xl overflow-hidden shadow-2xl">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-black/20 text-[#868c96] uppercase text-[10px] tracking-wider border-b border-white/5">
+                      <tr>
+                        <th className="py-3 px-4 w-12 text-center">#</th>
+                        <th className="py-3 px-4">Consultor</th>
+                        <th className="py-3 px-4">Concessionária</th>
+                        <th className="py-3 px-4 text-center">Vendas</th>
+                        <th className="py-3 px-4 text-right text-[#e5a93b]">Pontuação</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.02]">
+                      {dadosCalculados.rankingOrdenado.length === 0 && (
+                        <tr><td colSpan="5" className="py-8 text-center text-[#868c96] text-xs">Nenhum consultor cadastrado ainda. Seja o primeiro!</td></tr>
+                      )}
+                      {dadosCalculados.rankingOrdenado.map((vendedor, idx) => (
+                        <tr key={vendedor.id} className={`transition-all duration-500 ${vendedor.isMe ? 'bg-[#e5a93b]/[0.03] font-medium' : 'hover:bg-white/[0.01]'}`}>
+                          <td className="py-4 px-4 text-center font-mono font-bold text-sm text-zinc-600">{idx + 1}</td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-1.5"><span className="text-white font-bold">{vendedor.nome}</span>{vendedor.isMe && <span className="text-[8px] bg-[#e5a93b] text-black font-black px-1.5 py-0.5 rounded tracking-wide">VOCÊ</span>}</div>
+                            <span title={vendedor.tierAviso || ''} className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded mt-1.5 inline-block ${
+                              vendedor.tier === 'BLACK' ? 'bg-sky-950 text-[#38bdf8] border border-[#38bdf8]/20 shadow-[0_0_8px_rgba(56,189,248,0.15)]' :
+                              vendedor.tier === 'GOLD' ? 'bg-yellow-950 text-[#e5a93b] border border-[#e5a93b]/20' : 
+                              vendedor.tier === 'SILVER' ? 'bg-slate-800 text-slate-300' : 
+                              vendedor.tier === 'BRONZE' ? 'bg-amber-950 text-amber-600 border border-amber-900/20' : 'bg-zinc-800 text-zinc-400'
+                            }`}>{vendedor.tier}{vendedor.tierAviso ? ' *' : ''}</span>
+                          </td>
+                          <td className="py-4 px-4 text-[#868c96]">{vendedor.concessionaria}</td>
+                          <td className="py-4 px-4 text-center font-mono text-zinc-300">{vendedor.vendas}</td>
+                          <td className="py-4 px-4 text-right font-mono text-sm font-bold text-zinc-300">{vendedor.pontos}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {/* TELA 2: CONCESSIONÁRIAS */}
+          {currentTab === 'lojas' && (
+            <div className="space-y-6 animate-fade-in">
+              <section>
+                <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold mb-1"><span>♦</span> REDE PREMIUM COMERCIAL</div>
+                <h2 className="text-2xl font-bold uppercase font-mono">Disputa Entre Lojas</h2>
+                <p className="text-[#868c96] text-xs mt-0.5">Ranking por pontos e vendas validadas em cada unidade do grupo.</p>
+              </section>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded bg-[#e5a93b]/10 border border-[#e5a93b]/20 flex items-center justify-center text-[#e5a93b] text-lg"><i className="fa-solid fa-trophy"></i></div>
+                  <div>
+                    <span className="text-[9px] text-[#868c96] uppercase font-bold block">Unidade Líder (pontos)</span>
+                    <h4 className="text-sm font-bold text-white uppercase font-mono">{dadosCalculados.dashboardLojas[0]?.nome || '—'}</h4>
+                  </div>
+                </div>
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded bg-[#38bdf8]/10 border border-[#38bdf8]/20 flex items-center justify-center text-[#38bdf8] text-lg"><i className="fa-solid fa-layer-group"></i></div>
+                  <div>
+                    <span className="text-[9px] text-[#868c96] uppercase font-bold block">Pontuação Total Rede</span>
+                    <h4 className="text-sm font-bold text-white font-mono">{dadosCalculados.dashboardLojas.reduce((acc,l) => acc + l.pontos, 0)} pts</h4>
+                  </div>
+                </div>
+                <div className="la-panel border border-[#1c1f26] p-4 rounded-xl flex items-center gap-4">
+                  <div className="w-10 h-10 rounded bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg"><i className="fa-solid fa-circle-check"></i></div>
+                  <div>
+                    <span className="text-[9px] text-[#868c96] uppercase font-bold block">Vendas Validadas</span>
+                    <h4 className="text-sm font-bold text-white font-mono">{dadosCalculados.vendasValidadas}</h4>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {dadosCalculados.dashboardLojas.map((loja, index) => (
+                  <div key={loja.nome} className="la-panel border border-[#1c1f26] p-5 rounded-xl flex flex-col justify-between hover:border-[#e5a93b]/30 transition-all duration-300">
+                    <div>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="font-mono text-base font-bold text-zinc-600">0{index + 1}</span>
+                          <div>
+                            <h4 className="text-sm font-bold text-white">{loja.nome}</h4>
+                            <span className="text-[10px] text-[#868c96] uppercase">{loja.consultores} consultor(es) · {loja.vendas} vendas</span>
+                          </div>
+                        </div>
+                        <div className="text-zinc-500 text-sm"><i className={`fa-solid ${loja.icon}`}></i></div>
+                      </div>
+                      <div className="my-4">
+                        <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
+                          <span className="text-zinc-400">Participação na rede</span>
+                          <span className="text-[#e5a93b] font-mono">{loja.participacaoRede}%</span>
+                        </div>
+                        <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-[#e5a93b] to-[#f5c66c]" style={{ width: `${loja.participacaoRede}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center border-t border-white/5 pt-3 mt-2 text-xs font-mono">
+                      <div>
+                        <span className="text-[9px] text-[#868c96] block font-sans">Vendas validadas</span>
+                        <span className="text-emerald-400 font-bold">{loja.vendas}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-[#868c96] block font-sans">Pontuação Equipe</span>
+                        <span className="text-[#e5a93b] font-black text-sm">{loja.pontos} p</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TELA 3: LANÇAR VENDA - FORMULÁRIO OPERACIONAL INTEGRADO */}
+          {currentTab === 'lancar' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+              <div className="lg:col-span-2 la-glass-card border border-[#1c1f26] p-6 rounded-xl shadow-2xl">
+                <section className="mb-6 border-b border-white/5 pb-4">
+                  <h3 className="text-xl font-bold uppercase font-mono text-[#e5a93b]"><i className="fa-solid fa-file-invoice mr-2"></i>Lançamento Qualificado</h3>
+                  <p className="text-[#868c96] text-xs mt-1">Registre o chassi e as soluções vendidas para validação do bônus corporativo.</p>
+                </section>
+
+                <form onSubmit={handleSubmeterVenda} className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#868c96] mb-1.5">Identificação do Veículo (Chassi / Proposta)</label>
+                    <input type="text" placeholder="Digite os caracteres de validação..." value={formChassi} onChange={(e) => setFormChassi(e.target.value)} className="w-full bg-[#08090b] border border-[#1c1f26] rounded p-2.5 text-sm font-mono text-white focus:outline-none focus:border-[#e5a93b]" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#868c96] mb-1.5">Consultor Emissor</label>
+                    <div className="w-full bg-[#08090b] border border-[#1c1f26] rounded p-2.5 text-sm text-white">
+                      {currentUser?.nome} <span className="text-[#868c96]">({currentUser?.concessionaria})</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#868c96] mb-2">Selecione o Portfólio de Agregados</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.values(PRODUTOS_DB).map(p => {
+                        const selected = formProdutos.includes(p.id);
+                        return (
+                          <div key={p.id} onClick={() => handleToggleFormProduct(p.id)} className={`p-3 border rounded cursor-pointer select-none text-xs flex justify-between items-center transition-all ${selected ? 'border-[#e5a93b] bg-[#e5a93b]/5 text-white' : 'border-[#1c1f26] bg-[#08090b] text-[#868c96] hover:border-zinc-800'}`}>
+                            <div><span className="font-bold block text-white">{p.nome}</span><span className="text-[9px] opacity-60 uppercase">{p.categoria}</span></div>
+                            <span className="font-mono font-bold text-[#e5a93b]">+{p.pontos}p</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <button type="submit" disabled={submitting} className="w-full btn-la-primary uppercase text-xs tracking-wider py-3.5 rounded-lg disabled:opacity-50">
+                    {submitting ? 'Enviando...' : 'Enviar para Auditoria'}
+                  </button>
+                </form>
+              </div>
+
+              {/* ESTIMATIVA LATERAL EM TEMPO REAL */}
+              <div className="la-panel border border-[#1c1f26] p-5 rounded-xl flex flex-col justify-between shadow-xl h-fit">
+                <div>
+                  <p className="text-[9px] uppercase text-[#e5a93b] font-bold tracking-wider mb-4"><i className="fa-solid fa-calculator mr-1"></i> Previsão do Contrato</p>
+                  <div className="flex justify-between text-xs text-[#868c96] mb-2">Pontuação Estimada <span>+{calcularPontosProdutos(formProdutos).pontos} pts</span></div>
+                  {formProdutos.length > 0 && (
+                    <div className="flex justify-between text-xs text-[#868c96] mb-2">Combo <span className="text-[#e5a93b]">×{calcularPontosProdutos(formProdutos).maxMult.toFixed(1)}</span></div>
+                  )}
+                </div>
+                <div className="mt-4 bg-black/40 p-3 rounded text-[10px] font-mono text-zinc-500">
+                  ⚠️ O saldo final e a subida de posição no Leaderboard oficial serão processados assim que o Gerente aprovar na Fila de Auditoria.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TELA: MINHAS VENDAS / HISTÓRICO */}
+          {currentTab === 'historico' && (
+            <div className="space-y-4 animate-fade-in">
+              <section>
+                <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold mb-1">♦ HISTÓRICO</div>
+                <h2 className="text-2xl font-bold uppercase font-mono">Minhas Vendas</h2>
+                <p className="text-[#868c96] text-xs mt-0.5">Acompanhe pendências, aprovações e recusas com motivo.</p>
+              </section>
+              {meusContratos.length === 0 ? (
+                <div className="la-panel border border-[#1c1f26] p-10 rounded-xl text-center text-[#868c96] text-sm">
+                  Nenhum lançamento ainda. Use <strong className="text-white">Lançar Venda</strong> para registrar seu primeiro contrato.
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {meusContratos.map((c) => (
+                    <div key={c.id} className={`la-panel border p-4 rounded-xl ${
+                      c.status === 'Validado' ? 'border-emerald-500/30 bg-emerald-950/10' :
+                      c.status === 'Recusado' ? 'border-rose-500/30 bg-rose-950/10' : 'border-[#e5a93b]/30'
+                    }`}>
+                      <div className="flex flex-wrap justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-mono bg-zinc-800 px-2 py-0.5 rounded text-zinc-300">{c.chassi}</span>
+                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                          c.status === 'Validado' ? 'bg-emerald-500/15 text-emerald-400' :
+                          c.status === 'Recusado' ? 'bg-rose-500/15 text-rose-400' : 'bg-[#e5a93b]/15 text-[#e5a93b]'
+                        }`}>{c.status}</span>
+                      </div>
+                      <p className="text-sm font-bold text-white">{c.produtos}</p>
+                      <p className="text-xs text-[#868c96] mt-1">+{c.pontos} pts {c.multiplicador > 1 ? `(combo ×${c.multiplicador})` : ''}</p>
+                      {c.status === 'Recusado' && c.motivoRecusa && (
+                        <p className="text-xs text-rose-300/90 mt-2 bg-rose-500/10 border border-rose-500/20 p-2 rounded">
+                          <strong>Motivo:</strong> {c.motivoRecusa}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TELA 4: PAINEL DO GERENTE (AUDITORIA E VALIDAÇÃO) */}
+          {currentTab === 'gerente' && isGerente && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+              <div className="lg:col-span-2">
+                <section className="mb-4 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold flex items-center gap-1.5 mb-1"><span>♦</span> CONSOLE MANAGEMENT</div>
+                    <h3 className="text-xl font-bold uppercase font-mono">Fila de Liberação de Bônus</h3>
+                    <p className="text-[#868c96] text-xs mt-0.5">Aprovação e governança em tempo real integrada com as regras comerciais.</p>
+                  </div>
+                  <button type="button" onClick={() => exportarRankingCSV(dadosCalculados.rankingOrdenado)} className="btn-la-ghost text-[10px] font-bold uppercase px-3 py-2 rounded-lg whitespace-nowrap">
+                    <i className="fa-solid fa-file-export mr-1"></i>Exportar CSV
+                  </button>
+                </section>
+
+                <div className="flex flex-col gap-2.5">
+                  {contratos.length === 0 && (
+                    <div className="la-panel border border-[#1c1f26] p-8 rounded-xl text-center text-[#868c96] text-xs">
+                      Nenhum contrato na fila. Aguardando lançamentos dos consultores.
+                    </div>
+                  )}
+                  {contratos.map(item => (
+                    <div key={item.id} className={`la-panel border p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition-all duration-300 ${
+                      item.status === 'Validado' ? 'opacity-40 border-emerald-950 bg-emerald-950/5' : 
+                      item.status === 'Recusado' ? 'opacity-40 border-rose-950 bg-rose-950/5' : 'border-[#1c1f26]'
+                    }`}>
+                      <div>
+                        <span className="text-[10px] font-mono bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-400">{item.chassi}</span>
+                        <h4 className="text-sm font-bold text-white mt-1.5">{item.produtos}</h4>
+                        <p className="text-[11px] text-[#868c96]">Consultor Emissor: <strong className="text-zinc-300">{item.vendedorNome}</strong> | <span className="text-[#e5a93b]">+{item.pontos} pts</span></p>
+                        {item.status === 'Recusado' && item.motivoRecusa && (
+                          <p className="text-[10px] text-rose-400/90 mt-1"><strong>Motivo:</strong> {item.motivoRecusa}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        {item.status === 'Pendente' ? (
+                          <>
+                            <button disabled={submitting} onClick={() => handleRecusarContrato(item)} className="btn-la-ghost text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg disabled:opacity-50">Bloquear</button>
+                            <button disabled={submitting} onClick={() => handleAprovarContrato(item)} className="btn-la-primary text-[10px] px-4 py-1.5 rounded-lg disabled:opacity-50">Liberar</button>
+                          </>
+                        ) : (
+                          <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
+                            item.status === 'Validado' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          }`}>
+                            <i className={`fa-solid mr-1 ${item.status === 'Validado' ? 'fa-circle-check' : 'fa-circle-xmark'}`}></i>{item.status}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ACESSO AO BANCO SQL */}
+              <div>
+                <section className="mb-4">
+                  <div className="text-[10px] uppercase tracking-widest text-[#e5a93b] font-bold mb-1">♦ OPERAÇÃO LOCAL</div>
+                  <h3 className="text-xl font-bold uppercase font-mono">Quadro de Líderes (Top 4)</h3>
+                </section>
+                <div className="la-panel border border-[#1c1f26] rounded-xl overflow-hidden p-3 space-y-3 shadow-xl">
+                  {dadosCalculados.rankingOrdenado.slice(0, 4).map((v, i) => (
+                    <div key={v.id} className="flex justify-between items-center text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-zinc-600">{i+1}</span>
+                        <div>
+                          <p className="font-bold text-white">{v.nome}</p>
+                          <p className="text-[9px] text-[#868c96]">{v.concessionaria}</p>
+                        </div>
+                      </div>
+                      <span className="font-mono font-bold text-[#e5a93b]">{v.pontos}p</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 la-panel border border-[#1c1f26] p-4 rounded-xl text-[10px] font-mono text-[#868c96]">
+                  <div className="text-[#38bdf8] mb-1 font-bold"><i className="fa-solid fa-database mr-1"></i> Firebase Firestore</div>
+                  <p>Projeto: <span className="text-emerald-400">lacustomsperformace</span></p>
+                  <p className="mt-1">Status: <span className="text-emerald-400">● Conectado</span></p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {recusaModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+              <div className="la-glass-card la-z w-full max-w-md p-6">
+                <h3 className="text-lg font-bold text-white uppercase font-mono">Motivo da recusa</h3>
+                <p className="text-xs text-[#868c96] mt-1 mb-4">Chassi: <span className="font-mono text-zinc-300">{recusaModal.chassi}</span> — {recusaModal.vendedorNome}</p>
+                <textarea
+                  value={recusaMotivo}
+                  onChange={(e) => setRecusaMotivo(e.target.value)}
+                  placeholder="Ex: Chassi divergente, produtos não conferem com o contrato..."
+                  rows={4}
+                  className="la-input w-full bg-[#08090b] border border-[#1c1f26] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#e5a93b] resize-none"
+                />
+                <div className="flex gap-2 mt-4">
+                  <button type="button" onClick={() => setRecusaModal(null)} className="flex-1 btn-la-ghost text-xs font-bold uppercase py-2.5 rounded-lg">Cancelar</button>
+                  <button type="button" disabled={submitting} onClick={handleConfirmarRecusa} className="flex-1 btn-la-primary text-xs font-bold uppercase py-2.5 rounded-lg disabled:opacity-50">Confirmar recusa</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
