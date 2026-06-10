@@ -1,0 +1,28 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "backup.html",
+      "backup.txt",
+      "index.txt",
+      "firestore.rules",
+      "FIREBASE_SETUP.md",
+      "DEPLOY.md",
+      "PUBLICAR.bat",
+      "*.md",
+      "*.txt"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

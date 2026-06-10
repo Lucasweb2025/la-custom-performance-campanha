@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isGerente() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'gerente';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Mesmos e-mails de gestores.config.js (mantenha sincronizado)
+    function isGestorEmail() {
+      return isSignedIn() && request.auth.token.email in [
+        'lucaspweb@gmail.com',
+        'fabio.mena@lacustom.com.br'
+      ];
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if (isOwner(userId) || isGerente())
+        && request.resource.data.keys().hasAll(['nome', 'email', 'concessionaria', 'pontos', 'vendas', 'role'])
+        && (
+          request.resource.data.role == 'consultor'
+          || request.resource.data.role == 'gerente'
+        );
+      allow update: if isGerente()
+        || (isOwner(userId) && isGestorEmail()
+            && request.resource.data.role == 'gerente'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role']))
+        || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'pontos', 'vendas']));
+    }
+
+    match /contratos/{contratoId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.status == 'Pendente'
+        && request.resource.data.vendedorId == request.auth.uid;
+      allow update: if isGerente();
+    }
+
+    match /config/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+  }
+}
