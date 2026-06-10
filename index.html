@@ -225,6 +225,78 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    .la-toast-stack {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: min(100vw - 2rem, 22rem);
+      pointer-events: none;
+    }
+
+    .la-toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+      animation: la-toast-in 0.35s ease-out;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @keyframes la-toast-in {
+      from { opacity: 0; transform: translateX(12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .la-toast-success {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .la-toast-error {
+      background: rgba(244, 63, 94, 0.12);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
+    .la-toast-warning {
+      background: rgba(229, 169, 59, 0.12);
+      border-color: rgba(229, 169, 59, 0.4);
+      color: #f5c66c;
+    }
+
+    .la-toast-info {
+      background: rgba(17, 19, 23, 0.92);
+      border-color: rgba(229, 169, 59, 0.25);
+      color: #e5e7eb;
+    }
+
+    .la-toast-close {
+      margin-left: auto;
+      flex-shrink: 0;
+      opacity: 0.6;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .la-toast-close:hover { opacity: 1; }
   </style>
 </head>
 <body class="la-app text-white antialiased selection:bg-[#e5a93b]/30">
@@ -232,11 +304,39 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
+    const { useState, useMemo, useEffect, useCallback } = React;
 
     const LOGO_URL = 'https://i.ibb.co/27cxGcb1/lacustomlogotipo.png';
     const CHAVE_CADASTRO = 'LA2026';
     const GESTOR_EMAILS = (window.GESTOR_EMAILS || []).map((e) => e.toLowerCase().trim());
+
+    const PRODUTOS_DB = {
+      ppf_full: { id: 'ppf_full', nome: 'PPF Full', categoria: 'Premium', pontos: 60, desc: 'Película de proteção integral', tipo: 'premium' },
+      crystaline: { id: 'crystaline', nome: 'Crystalline', categoria: 'Premium', pontos: 35, desc: 'Vitrificação cerâmica premium', tipo: 'premium' },
+      sas: { id: 'sas', nome: 'SAS 3M', categoria: 'Premium', pontos: 25, desc: 'Sistema antiarranhão', tipo: 'premium' },
+      combo_care: { id: 'combo_care', nome: 'Combo Care', categoria: 'Premium', pontos: 30, desc: 'Pacote completo de proteção', tipo: 'premium' },
+      parabrisa: { id: 'parabrisa', nome: 'Para-brisa', categoria: 'Estratégico', pontos: 20, desc: 'Película protetora de para-brisa', tipo: 'estrategico' },
+      insulfilm: { id: 'insulfilm', nome: 'Insulfilm', categoria: 'Constância', pontos: 8, desc: 'Película solar tradicional', tipo: 'constancia' },
+      higienizacao: { id: 'higienizacao', nome: 'Higienização', categoria: 'Constância', pontos: 6, desc: 'Limpeza técnica interna', tipo: 'constancia' },
+      polimento: { id: 'polimento', nome: 'Polimento', categoria: 'Constância', pontos: 10, desc: 'Correção de pintura', tipo: 'constancia' }
+    };
+
+    const PREMIUM_IDS = Object.keys(PRODUTOS_DB).filter((id) => PRODUTOS_DB[id].tipo === 'premium');
+
+    const COMBOS_REGRAS = [
+      { id: 'ouro', nome: 'Combo Ouro L.A', itens: ['combo_care', 'crystaline', 'ppf_full'], multiplicador: 2.0, tag: 'Multiplicador Máximo' },
+      { id: 'total', nome: 'Proteção Total', itens: ['ppf_full', 'parabrisa', 'sas'], multiplicador: 1.8, tag: 'Rota Black' },
+      { id: 'blindagem', nome: 'Blindagem Premium', itens: ['ppf_full', 'parabrisa'], multiplicador: 1.5, tag: 'Acelerador Gold' }
+    ];
+
+    const TIER_LIMITS = { BRONZE: 40, SILVER: 80, GOLD: 140, BLACK: 220 };
+
+    const TIERS_METAS = [
+      { nome: 'BRONZE', min: TIER_LIMITS.BRONZE, cor: 'text-amber-600', bg: 'from-amber-700 to-amber-500' },
+      { nome: 'SILVER', min: TIER_LIMITS.SILVER, cor: 'text-slate-300', bg: 'from-slate-400 to-slate-300' },
+      { nome: 'GOLD', min: TIER_LIMITS.GOLD, cor: 'text-[#e5a93b]', bg: 'from-[#c9922e] to-[#f5c66c]' },
+      { nome: 'BLACK', min: TIER_LIMITS.BLACK, cor: 'text-[#38bdf8]', bg: 'from-[#0ea5e9] to-[#38bdf8]' }
+    ];
 
     function emailEhGestor(email) {
       if (!email) return false;
@@ -270,14 +370,14 @@
     }
 
     function calcularPontosProdutos(produtoIds) {
-      let base = produtoIds.reduce((acc, id) => acc + (PRODUTOS_DB[id]?.pontos || 0), 0);
+      const base = produtoIds.reduce((acc, id) => acc + (PRODUTOS_DB[id]?.pontos || 0), 0);
       let maxMult = 1.0;
-      COMBOS_REGRAS.forEach(combo => {
-        if (combo.itens.every(item => produtoIds.includes(item)) && combo.multiplicador > maxMult) {
+      COMBOS_REGRAS.forEach((combo) => {
+        if (combo.itens.every((item) => produtoIds.includes(item)) && combo.multiplicador > maxMult) {
           maxMult = combo.multiplicador;
         }
       });
-      return { pontos: Math.round(base * maxMult), maxMult };
+      return { base, pontos: Math.round(base * maxMult), maxMult };
     }
 
     function analisarVendasUsuario(contratos, userId, extraSim = null) {
@@ -305,21 +405,21 @@
       let tier = 'INICIANTE';
       let aviso = '';
 
-      if (pts >= 220) {
+      if (pts >= TIER_LIMITS.BLACK) {
         tier = 'BLACK';
-      } else if (pts >= 140) {
+      } else if (pts >= TIER_LIMITS.GOLD) {
         if (premiumDistintos.size >= 2 || teveMultiplicador) tier = 'GOLD';
         else {
           tier = 'SILVER';
           aviso = 'Pontos Gold, mas falta: 2 Premium diferentes ou 1 combo multiplicador validado.';
         }
-      } else if (pts >= 80) {
+      } else if (pts >= TIER_LIMITS.SILVER) {
         if (premiumDistintos.size >= 1) tier = 'SILVER';
         else {
           tier = 'BRONZE';
           aviso = 'Pontos Silver, mas falta: mínimo 1 produto Premium em venda validada.';
         }
-      } else if (pts >= 40) {
+      } else if (pts >= TIER_LIMITS.BRONZE) {
         tier = 'BRONZE';
       }
 
@@ -342,25 +442,6 @@
       URL.revokeObjectURL(url);
     }
 
-    const PRODUTOS_DB = {
-      ppf_full: { id: 'ppf_full', nome: 'PPF Full', categoria: 'Premium', pontos: 60, desc: 'Película de proteção integral', tipo: 'premium' },
-      crystaline: { id: 'crystaline', nome: 'Crystalline', categoria: 'Premium', pontos: 35, desc: 'Vitrificação cerâmica premium', tipo: 'premium' },
-      sas: { id: 'sas', nome: 'SAS 3M', categoria: 'Premium', pontos: 25, desc: 'Sistema antiarranhão', tipo: 'premium' },
-      combo_care: { id: 'combo_care', nome: 'Combo Care', categoria: 'Premium', pontos: 30, desc: 'Pacote completo de proteção', tipo: 'premium' },
-      parabrisa: { id: 'parabrisa', nome: 'Para-brisa', categoria: 'Estratégico', pontos: 20, desc: 'Película protetora de para-brisa', tipo: 'estrategico' },
-      insulfilm: { id: 'insulfilm', nome: 'Insulfilm', categoria: 'Constância', pontos: 8, desc: 'Película solar tradicional', tipo: 'constancia' },
-      higienizacao: { id: 'higienizacao', nome: 'Higienização', categoria: 'Constância', pontos: 6, desc: 'Limpeza técnica interna', tipo: 'constancia' },
-      polimento: { id: 'polimento', nome: 'Polimento', categoria: 'Constância', pontos: 10, desc: 'Correção de pintura', tipo: 'constancia' }
-    };
-
-    const PREMIUM_IDS = Object.keys(PRODUTOS_DB).filter((id) => PRODUTOS_DB[id].tipo === 'premium');
-
-    const COMBOS_REGRAS = [
-      { id: 'ouro', nome: 'Combo Ouro L.A', itens: ['combo_care', 'crystaline', 'ppf_full'], multiplicador: 2.0, tag: 'Multiplicador Máximo' },
-      { id: 'total', nome: 'Proteção Total', itens: ['ppf_full', 'parabrisa', 'sas'], multiplicador: 1.8, tag: 'Rota Black' },
-      { id: 'blindagem', nome: 'Blindagem Premium', itens: ['ppf_full', 'parabrisa'], multiplicador: 1.5, tag: 'Acelerador Gold' }
-    ];
-
     const CONCESSIONARIAS = [
       { id: 'sede', nome: 'L.A CUSTOM SEDE', icon: 'fa-building' },
       { id: 'stuttgart_vo', nome: 'STUTTGART VILA OLIMPIA', icon: 'fa-location-dot' },
@@ -370,6 +451,29 @@
       { id: 'clodomiro', nome: 'UNIDADE CLODOMIRO', icon: 'fa-map-pin' },
       { id: 'motorsport', nome: 'MOTORSPORT', icon: 'fa-flag-checkered' }
     ];
+
+    const TOAST_ICONS = {
+      success: 'fa-circle-check',
+      error: 'fa-circle-xmark',
+      warning: 'fa-triangle-exclamation',
+      info: 'fa-circle-info'
+    };
+
+    function ToastStack({ toasts, onRemove }) {
+      if (!toasts.length) return null;
+      return ReactDOM.createPortal(
+        <div className="la-toast-stack" role="status" aria-live="polite">
+          {toasts.map((t) => (
+            <div key={t.id} className={`la-toast la-toast-${t.type}`}>
+              <i className={`fa-solid ${TOAST_ICONS[t.type] || TOAST_ICONS.info} mt-0.5 shrink-0`}></i>
+              <span className="flex-1">{t.message}</span>
+              <button type="button" className="la-toast-close" onClick={() => onRemove(t.id)} aria-label="Fechar">×</button>
+            </div>
+          ))}
+        </div>,
+        document.body
+      );
+    }
 
     function App() {
       const [authMode, setAuthMode] = useState('login');
@@ -408,8 +512,22 @@
       const [notifLidas, setNotifLidas] = useState(() => {
         try { return JSON.parse(localStorage.getItem('la_notif_lidas') || '[]'); } catch { return []; }
       });
+      const [toasts, setToasts] = useState([]);
+
+      const dismissToast = useCallback((id) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, []);
+
+      const showToast = useCallback((message, type = 'info') => {
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+        setToasts((prev) => [...prev, { id, message, type }]);
+        window.setTimeout(() => dismissToast(id), 4500);
+      }, [dismissToast]);
 
       const isGerente = currentUser?.role === 'gerente';
+      const toastUI = <ToastStack toasts={toasts} onRemove={dismissToast} />;
+
+      const formPontosCalc = useMemo(() => calcularPontosProdutos(formProdutos), [formProdutos]);
 
       useEffect(() => {
         if (isLoggedIn && !isGerente && currentTab === 'gerente') {
@@ -529,12 +647,12 @@
       const handleRecuperarSenha = async (e) => {
         e.preventDefault();
         const email = resetEmail.trim() || loginEmail.trim();
-        if (!email) return alert('Informe seu e-mail.');
+        if (!email) return showToast('Informe seu e-mail.', 'error');
         setAuthError('');
         setSubmitting(true);
         try {
           await auth.sendPasswordResetEmail(email);
-          alert('E-mail de recuperação enviado! Verifique a caixa de entrada e o spam.');
+          showToast('E-mail de recuperação enviado! Verifique a caixa de entrada e o spam.', 'success');
           setAuthMode('login');
         } catch (err) {
           setAuthError(err.code === 'auth/user-not-found'
@@ -562,11 +680,11 @@
 
       const handleEfetuarCadastro = async (e) => {
         e.preventDefault();
-        if (!cadNome) return alert('Por favor, digite o nome completo.');
-        if (!cadEmail) return alert('Informe um e-mail válido.');
-        if (cadSenha.length < 6) return alert('A senha deve ter pelo menos 6 caracteres.');
+        if (!cadNome) return showToast('Por favor, digite o nome completo.', 'error');
+        if (!cadEmail) return showToast('Informe um e-mail válido.', 'error');
+        if (cadSenha.length < 6) return showToast('A senha deve ter pelo menos 6 caracteres.', 'error');
         if (cadChave !== CHAVE_CADASTRO) {
-          return alert('❌ ACESSO NEGADO: Chave Corporativa incorreta.');
+          return showToast('Acesso negado: chave corporativa incorreta.', 'warning');
         }
         setAuthError('');
         setSubmitting(true);
@@ -583,7 +701,7 @@
             vendas: 0,
             criadoEm: FieldValue.serverTimestamp()
           });
-          alert(`🎯 Credenciamento aceito! Bem-vindo, ${cadNome}.`);
+          showToast(`Credenciamento aceito! Bem-vindo, ${cadNome}.`, 'success');
           setCurrentTab('inicio');
         } catch (err) {
           if (err.code === 'auth/email-already-in-use') {
@@ -600,12 +718,12 @@
         e.preventDefault();
         if (!currentUser) return;
         const chassiNorm = formChassi.toUpperCase().trim();
-        if (!chassiNorm) return alert('Por favor, digite o Chassi ou número do contrato.');
-        if (formProdutos.length === 0) return alert('Selecione pelo menos um produto para lançar.');
+        if (!chassiNorm) return showToast('Por favor, digite o Chassi ou número do contrato.', 'error');
+        if (formProdutos.length === 0) return showToast('Selecione pelo menos um produto para lançar.', 'error');
         const duplicado = contratos.some(
           (c) => c.chassi === chassiNorm && (c.status === 'Pendente' || c.status === 'Validado')
         );
-        if (duplicado) return alert('Este chassi já possui lançamento pendente ou validado.');
+        if (duplicado) return showToast('Este chassi já possui lançamento pendente ou validado.', 'warning');
 
         const { pontos, maxMult } = calcularPontosProdutos(formProdutos);
         setSubmitting(true);
@@ -623,11 +741,11 @@
           });
           setFormChassi('');
           setFormProdutos([]);
-          alert('Contrato enviado para auditoria do gerente!');
+          showToast('Contrato enviado para auditoria do gerente!', 'success');
           setCurrentTab('inicio');
         } catch (err) {
           console.error(err);
-          alert('Erro ao enviar contrato. Verifique sua conexão.');
+          showToast('Erro ao enviar contrato. Verifique sua conexão.', 'error');
         } finally {
           setSubmitting(false);
         }
@@ -647,9 +765,10 @@
             pontos: FieldValue.increment(contrato.pontos)
           });
           await batch.commit();
+          showToast('Contrato aprovado e pontos creditados.', 'success');
         } catch (err) {
           console.error(err);
-          alert('Erro ao aprovar contrato.');
+          showToast('Erro ao aprovar contrato.', 'error');
         } finally {
           setSubmitting(false);
         }
@@ -663,7 +782,7 @@
 
       const handleConfirmarRecusa = async () => {
         if (!recusaModal) return;
-        if (!recusaMotivo.trim()) return alert('Informe o motivo da recusa para o consultor.');
+        if (!recusaMotivo.trim()) return showToast('Informe o motivo da recusa para o consultor.', 'error');
         setSubmitting(true);
         try {
           await db.collection('contratos').doc(recusaModal.id).update({
@@ -673,9 +792,10 @@
           });
           setRecusaModal(null);
           setRecusaMotivo('');
+          showToast('Contrato recusado. O consultor será notificado.', 'info');
         } catch (err) {
           console.error(err);
-          alert('Erro ao recusar contrato.');
+          showToast('Erro ao recusar contrato.', 'error');
         } finally {
           setSubmitting(false);
         }
@@ -684,9 +804,9 @@
       const handleCriarUsuarioManual = async (e) => {
         e.preventDefault();
         if (!isGerente) return;
-        if (!novoUserNome.trim()) return alert('Informe o nome do colaborador.');
-        if (!novoUserEmail.trim()) return alert('Informe o e-mail do colaborador.');
-        if (novoUserSenha.length < 6) return alert('A senha deve ter pelo menos 6 caracteres.');
+        if (!novoUserNome.trim()) return showToast('Informe o nome do colaborador.', 'error');
+        if (!novoUserEmail.trim()) return showToast('Informe o e-mail do colaborador.', 'error');
+        if (novoUserSenha.length < 6) return showToast('A senha deve ter pelo menos 6 caracteres.', 'error');
         setSubmitting(true);
         try {
           const secondaryApp = firebase.initializeApp(firebaseConfig, 'secondary_' + Date.now());
@@ -711,13 +831,13 @@
           setNovoUserEmail('');
           setNovoUserSenha('');
           setNovoUserRole('consultor');
-          alert('Colaborador cadastrado com sucesso!');
+          showToast('Colaborador cadastrado com sucesso!', 'success');
         } catch (err) {
           console.error(err);
           if (err.code === 'auth/email-already-in-use') {
-            alert('Este e-mail já está cadastrado no sistema.');
+            showToast('Este e-mail já está cadastrado no sistema.', 'warning');
           } else {
-            alert('Erro ao criar usuário: ' + (err.message || 'tente novamente'));
+            showToast('Erro ao criar usuário: ' + (err.message || 'tente novamente'), 'error');
           }
         } finally {
           setSubmitting(false);
@@ -730,9 +850,10 @@
         setSubmitting(true);
         try {
           await db.collection('users').doc(userId).update({ bloqueado: true });
+          showToast(`Acesso de ${nomeUser} bloqueado.`, 'info');
         } catch (err) {
           console.error(err);
-          alert('Erro ao bloquear usuário.');
+          showToast('Erro ao bloquear usuário.', 'error');
         } finally {
           setSubmitting(false);
         }
@@ -743,9 +864,10 @@
         setSubmitting(true);
         try {
           await db.collection('users').doc(userId).update({ bloqueado: false });
+          showToast('Acesso desbloqueado com sucesso.', 'success');
         } catch (err) {
           console.error(err);
-          alert('Erro ao desbloquear usuário.');
+          showToast('Erro ao desbloquear usuário.', 'error');
         } finally {
           setSubmitting(false);
         }
@@ -760,14 +882,7 @@
       }, [vendedores, currentUser]);
 
       const dadosCalculados = useMemo(() => {
-        let simBase = simuladorSelecionados.reduce((acc, curr) => acc + PRODUTOS_DB[curr].pontos, 0);
-        let simMaxMult = 1.0;
-        COMBOS_REGRAS.forEach(combo => {
-          if (combo.itens.every(item => simuladorSelecionados.includes(item)) && combo.multiplicador > simMaxMult) {
-            simMaxMult = combo.multiplicador;
-          }
-        });
-        let simTotalVenda = simBase * simMaxMult;
+        const { base: simBase, pontos: simTotalVenda, maxMult: simMaxMult } = calcularPontosProdutos(simuladorSelecionados);
 
         let pendentes = 0;
         let vendasValidadas = 0;
@@ -829,12 +944,6 @@
         else if (simNivel === 'SILVER') { simCor = 'text-slate-300'; simPremios = { bonus: 'R$ 500,00', comissao: '2,5% / 5,0%', extra: 'Almoço Premium + Reconhecimento 🥈' }; }
         else if (simNivel === 'BRONZE') { simCor = 'text-amber-600'; simPremios = { bonus: 'R$ 200,00', comissao: '2,5% / 5,0%', extra: 'Reconhecimento Interno 🥉' }; }
 
-        const TIERS_METAS = [
-          { nome: 'BRONZE', min: 40, cor: 'text-amber-600', bg: 'from-amber-700 to-amber-500' },
-          { nome: 'SILVER', min: 80, cor: 'text-slate-300', bg: 'from-slate-400 to-slate-300' },
-          { nome: 'GOLD', min: 140, cor: 'text-[#e5a93b]', bg: 'from-[#c9922e] to-[#f5c66c]' },
-          { nome: 'BLACK', min: 220, cor: 'text-[#38bdf8]', bg: 'from-[#0ea5e9] to-[#38bdf8]' }
-        ];
         const meuPontos = meusDados.pontos || 0;
         const meuTierInfo = currentUser
           ? calcularTierEfetivo(meuPontos, contratos, currentUser.uid)
@@ -871,18 +980,23 @@
 
       if (authLoading) {
         return (
+          <>
+          {toastUI}
           <div className="la-auth-page min-h-screen flex items-center justify-center">
             <div className="la-z text-center">
               <div className="text-[#e5a93b] text-2xl mb-3"><i className="fa-solid fa-circle-notch fa-spin"></i></div>
               <p className="text-xs text-[#868c96] uppercase tracking-widest">Conectando ao Firebase...</p>
             </div>
           </div>
+          </>
         );
       }
 
       if (!isLoggedIn) {
         if (authMode === 'login') {
           return (
+            <>
+            {toastUI}
             <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
               <div className="la-z w-full max-w-md">
                 <div className="la-glass-card p-8 md:p-10 w-full">
@@ -917,9 +1031,12 @@
                 </div>
               </div>
             </div>
+            </>
           );
         } else if (authMode === 'recuperar') {
           return (
+            <>
+            {toastUI}
             <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
               <div className="la-z w-full max-w-md">
                 <div className="la-glass-card p-8 md:p-10 w-full">
@@ -946,9 +1063,12 @@
                 </div>
               </div>
             </div>
+            </>
           );
         } else {
           return (
+            <>
+            {toastUI}
             <div className="la-auth-page min-h-screen flex items-center justify-center p-4">
               <div className="la-z w-full max-w-md">
                 <div className="la-glass-card p-8 md:p-10 w-full animate-fade-in">
@@ -995,11 +1115,14 @@
                 </div>
               </div>
             </div>
+            </>
           );
         }
       }
 
       return (
+        <>
+        {toastUI}
         <div className="la-page-wrap min-h-screen">
         <div className="la-z max-w-6xl mx-auto p-4 md:p-6 animate-fade-in">
           
@@ -1430,9 +1553,9 @@
               <div className="la-panel border border-[#1c1f26] p-5 rounded-xl flex flex-col justify-between shadow-xl h-fit">
                 <div>
                   <p className="text-[9px] uppercase text-[#e5a93b] font-bold tracking-wider mb-4"><i className="fa-solid fa-calculator mr-1"></i> Previsão do Contrato</p>
-                  <div className="flex justify-between text-xs text-[#868c96] mb-2">Pontuação Estimada <span>+{calcularPontosProdutos(formProdutos).pontos} pts</span></div>
+                  <div className="flex justify-between text-xs text-[#868c96] mb-2">Pontuação Estimada <span>+{formPontosCalc.pontos} pts</span></div>
                   {formProdutos.length > 0 && (
-                    <div className="flex justify-between text-xs text-[#868c96] mb-2">Combo <span className="text-[#e5a93b]">×{calcularPontosProdutos(formProdutos).maxMult.toFixed(1)}</span></div>
+                    <div className="flex justify-between text-xs text-[#868c96] mb-2">Combo <span className="text-[#e5a93b]">×{formPontosCalc.maxMult.toFixed(1)}</span></div>
                   )}
                 </div>
                 <div className="mt-4 bg-black/40 p-3 rounded text-[10px] font-mono text-zinc-500">
@@ -1689,6 +1812,7 @@
 
         </div>
         </div>
+        </>
       );
     }
 
